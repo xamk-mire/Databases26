@@ -1,0 +1,7 @@
+id,name,email,joined_date,status
+1,Ada Lovelace,ada.lovelace@example.com,2023-01-15,ACTIVE
+2,Alan Turing,alan.turing@example.com,2023-02-03,ACTIVE
+3,Grace Hopper,grace.hopper@example.com,2023-03-21,ACTIVE
+4,Donald Knuth,donald.knuth@example.com,2023-04-10,SUSPENDED
+5,Barbara Liskov,barbara.liskov@example.com,2023-05-08,ACTIVE
+6,Ada Lovelace,ada@example.com,2026-01-05,ACTIVE

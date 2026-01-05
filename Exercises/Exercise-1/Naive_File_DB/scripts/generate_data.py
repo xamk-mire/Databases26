@@ -275,7 +275,7 @@ def build_args() -> Args:
     p.add_argument("--books", type=int, default=5000)
     p.add_argument("--members", type=int, default=2000)
     p.add_argument("--loans", type=int, default=4000)
-    p.add_argument("--out", type=str, default="./data")
+    p.add_argument("--out", type=str, default="../data")
     p.add_argument("--seed", type=int, default=42)
 
     p.add_argument("--start-date", type=str, default="2024-01-01")
