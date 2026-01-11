@@ -1,15 +1,7 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Optional
-
-BOOK_AVAILABLE = "AVAILABLE"
-BOOK_OUT = "OUT"
-
-MEMBER_ACTIVE = "ACTIVE"
-MEMBER_SUSPENDED = "SUSPENDED"
-
-LOAN_OUT = "OUT"
-LOAN_RETURNED = "RETURNED"
 
 
 @dataclass(frozen=True)
@@ -19,7 +11,7 @@ class Book:
     author: str
     year: int
     isbn: str
-    status: str  # AVAILABLE | OUT
+    status: str  # AVAILABLE | OUT (no enforcement here on purpose)
 
 
 @dataclass(frozen=True)
@@ -27,7 +19,7 @@ class Member:
     id: int
     name: str
     email: str
-    joined_date: str  # YYYY-MM-DD
+    joined_date: str  # ISO date string
     status: str  # ACTIVE | SUSPENDED
 
 
@@ -36,6 +28,6 @@ class Loan:
     id: int
     book_id: int
     member_id: int
-    loan_date: str  # YYYY-MM-DD
-    return_date: str  # empty string means NULL
+    loan_date: str  # ISO date string
+    return_date: Optional[str]  # ISO date string or None
     status: str  # OUT | RETURNED

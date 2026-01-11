@@ -1,1 +1,2 @@
 # No third-party dependencies required
+python-dateutil==2.9.0.post0

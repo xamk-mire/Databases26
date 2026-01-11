@@ -29,19 +29,81 @@ from typing import List, Optional, Tuple
 
 
 WORDS = [
-    "Shadow", "Empire", "Storm", "Crystal", "Moon", "Iron", "Dawn", "Night", "River", "Star",
-    "Garden", "Machine", "Signal", "Cipher", "Archive", "Labyrinth", "Echo", "Voyage", "Dust", "Code",
-    "Fire", "Glass", "Whisper", "Quantum", "Atlas", "Circuit", "Harbor", "Phoenix", "Dream", "Halo"
+    "Shadow",
+    "Empire",
+    "Storm",
+    "Crystal",
+    "Moon",
+    "Iron",
+    "Dawn",
+    "Night",
+    "River",
+    "Star",
+    "Garden",
+    "Machine",
+    "Signal",
+    "Cipher",
+    "Archive",
+    "Labyrinth",
+    "Echo",
+    "Voyage",
+    "Dust",
+    "Code",
+    "Fire",
+    "Glass",
+    "Whisper",
+    "Quantum",
+    "Atlas",
+    "Circuit",
+    "Harbor",
+    "Phoenix",
+    "Dream",
+    "Halo",
 ]
 
 FIRST_NAMES = [
-    "Ada", "Alan", "Grace", "Donald", "Barbara", "Edsger", "Linus", "Tim", "Margaret", "Katherine",
-    "Dennis", "Ken", "Guido", "James", "Frances", "John", "Claude", "Mary", "Satoshi", "Hedy"
+    "Ada",
+    "Alan",
+    "Grace",
+    "Donald",
+    "Barbara",
+    "Edsger",
+    "Linus",
+    "Tim",
+    "Margaret",
+    "Katherine",
+    "Dennis",
+    "Ken",
+    "Guido",
+    "James",
+    "Frances",
+    "John",
+    "Claude",
+    "Mary",
+    "Satoshi",
+    "Hedy",
 ]
 LAST_NAMES = [
-    "Lovelace", "Turing", "Hopper", "Knuth", "Liskov", "Dijkstra", "Torvalds", "Berners-Lee",
-    "Hamilton", "Johnson", "Ritchie", "Thompson", "van Rossum", "Gosling", "Allen", "Backus",
-    "Shannon", "Jackson", "Nakamoto", "Lamarr"
+    "Lovelace",
+    "Turing",
+    "Hopper",
+    "Knuth",
+    "Liskov",
+    "Dijkstra",
+    "Torvalds",
+    "Berners-Lee",
+    "Hamilton",
+    "Johnson",
+    "Ritchie",
+    "Thompson",
+    "van Rossum",
+    "Gosling",
+    "Allen",
+    "Backus",
+    "Shannon",
+    "Jackson",
+    "Nakamoto",
+    "Lamarr",
 ]
 
 
@@ -106,7 +168,14 @@ def write_books(path: str, rng: random.Random, n: int, out_ratio: float) -> None
             w.writerow([i, title, author, year, isbn13(rng), status])
 
 
-def write_members(path: str, rng: random.Random, n: int, start: date, end: date, suspended_ratio: float) -> None:
+def write_members(
+    path: str,
+    rng: random.Random,
+    n: int,
+    start: date,
+    end: date,
+    suspended_ratio: float,
+) -> None:
     used_emails = set()
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
@@ -120,7 +189,9 @@ def write_members(path: str, rng: random.Random, n: int, start: date, end: date,
                 email = f"{base}{rng.randint(1, 9999)}@example.com"
             used_emails.add(email)
 
-            joined = rand_date(rng, start - timedelta(days=365 * 3), start)  # joined in the past
+            joined = rand_date(
+                rng, start - timedelta(days=365 * 3), start
+            )  # joined in the past
             status = "SUSPENDED" if rng.random() < suspended_ratio else "ACTIVE"
             w.writerow([i, name, email, joined.isoformat(), status])
 
@@ -183,17 +254,34 @@ def write_loans(
                 return_dt_date = end
             return_dt = return_dt_date.isoformat()
 
-        rows.append([str(next_id), str(book_id), str(member_id), loan_dt.isoformat(), return_dt, status])
+        rows.append(
+            [
+                str(next_id),
+                str(book_id),
+                str(member_id),
+                loan_dt.isoformat(),
+                return_dt,
+                status,
+            ]
+        )
         next_id += 1
 
     # Inject bad references
     for _ in range(bad_refs):
         # 50/50 broken book_id vs broken member_id
         bad_book = rng.random() < 0.5
-        book_id = n_books + rng.randint(1, 5000) if bad_book else rng.randint(1, n_books)
-        member_id = rng.randint(1, n_members) if bad_book else (n_members + rng.randint(1, 5000))
+        book_id = (
+            n_books + rng.randint(1, 5000) if bad_book else rng.randint(1, n_books)
+        )
+        member_id = (
+            rng.randint(1, n_members)
+            if bad_book
+            else (n_members + rng.randint(1, 5000))
+        )
         loan_dt = rand_date(rng, start, end)
-        rows.append([str(next_id), str(book_id), str(member_id), loan_dt.isoformat(), "", "OUT"])
+        rows.append(
+            [str(next_id), str(book_id), str(member_id), loan_dt.isoformat(), "", "OUT"]
+        )
         next_id += 1
 
     # Inject double checkout (reusing books currently OUT)
@@ -206,7 +294,9 @@ def write_loans(
             book_id = rng.randint(1, n_books)
         member_id = rng.randint(1, n_members)
         loan_dt = rand_date(rng, start, end)
-        rows.append([str(next_id), str(book_id), str(member_id), loan_dt.isoformat(), "", "OUT"])
+        rows.append(
+            [str(next_id), str(book_id), str(member_id), loan_dt.isoformat(), "", "OUT"]
+        )
         next_id += 1
 
     # Inject inconsistent rows (contradict status/dates)
@@ -223,7 +313,16 @@ def write_loans(
             # RETURNED but missing return_date
             return_dt = ""
             status = "RETURNED"
-        rows.append([str(next_id), str(book_id), str(member_id), loan_dt.isoformat(), return_dt, status])
+        rows.append(
+            [
+                str(next_id),
+                str(book_id),
+                str(member_id),
+                loan_dt.isoformat(),
+                return_dt,
+                status,
+            ]
+        )
         next_id += 1
 
     # Write
@@ -244,7 +343,10 @@ def write_schema_drift_variants(out_dir: str) -> None:
 
     # members_drift.csv: drop status from every 10th row
     dst_members = os.path.join(out_dir, "members_drift.csv")
-    with open(members_src, newline="", encoding="utf-8") as f_in, open(dst_members, "w", newline="", encoding="utf-8") as f_out:
+    with (
+        open(members_src, newline="", encoding="utf-8") as f_in,
+        open(dst_members, "w", newline="", encoding="utf-8") as f_out,
+    ):
         r = csv.reader(f_in)
         w = csv.writer(f_out)
         header = next(r)
@@ -258,7 +360,10 @@ def write_schema_drift_variants(out_dir: str) -> None:
 
     # loans_drift.csv: add a new column in header, but only populate sometimes
     dst_loans = os.path.join(out_dir, "loans_drift.csv")
-    with open(loans_src, newline="", encoding="utf-8") as f_in, open(dst_loans, "w", newline="", encoding="utf-8") as f_out:
+    with (
+        open(loans_src, newline="", encoding="utf-8") as f_in,
+        open(dst_loans, "w", newline="", encoding="utf-8") as f_out,
+    ):
         r = csv.reader(f_in)
         w = csv.writer(f_out)
         header = next(r)
@@ -281,14 +386,41 @@ def build_args() -> Args:
     p.add_argument("--start-date", type=str, default="2024-01-01")
     p.add_argument("--end-date", type=str, default="2024-12-31")
 
-    p.add_argument("--out-ratio", type=float, default=0.35, help="Fraction of loans/books that are OUT")
-    p.add_argument("--suspended-ratio", type=float, default=0.10, help="Fraction of members that are SUSPENDED")
+    p.add_argument(
+        "--out-ratio",
+        type=float,
+        default=0.35,
+        help="Fraction of loans/books that are OUT",
+    )
+    p.add_argument(
+        "--suspended-ratio",
+        type=float,
+        default=0.10,
+        help="Fraction of members that are SUSPENDED",
+    )
 
     # pain injection knobs
-    p.add_argument("--bad-refs", type=int, default=0, help="Add N loans referencing missing book_id/member_id")
-    p.add_argument("--double-checkout", type=int, default=0, help="Add N extra OUT loans reusing an OUT book_id")
-    p.add_argument("--inconsistent", type=int, default=0, help="Add N inconsistent loans (status/date mismatch)")
-    p.add_argument("--schema-drift", action="store_true", help="Also output drifted CSV variants")
+    p.add_argument(
+        "--bad-refs",
+        type=int,
+        default=0,
+        help="Add N loans referencing missing book_id/member_id",
+    )
+    p.add_argument(
+        "--double-checkout",
+        type=int,
+        default=0,
+        help="Add N extra OUT loans reusing an OUT book_id",
+    )
+    p.add_argument(
+        "--inconsistent",
+        type=int,
+        default=0,
+        help="Add N inconsistent loans (status/date mismatch)",
+    )
+    p.add_argument(
+        "--schema-drift", action="store_true", help="Also output drifted CSV variants"
+    )
 
     ns = p.parse_args()
     return Args(
@@ -318,7 +450,9 @@ def main() -> None:
     loans_path = os.path.join(a.out, "loans.csv")
 
     write_books(books_path, rng, a.books, a.out_ratio)
-    write_members(members_path, rng, a.members, a.start_date, a.end_date, a.suspended_ratio)
+    write_members(
+        members_path, rng, a.members, a.start_date, a.end_date, a.suspended_ratio
+    )
     write_loans(
         loans_path,
         rng,
