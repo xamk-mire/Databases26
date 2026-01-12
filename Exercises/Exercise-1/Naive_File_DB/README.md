@@ -104,10 +104,10 @@ Requires Python **3.10+**.
 #### 1. Ensure you are in correct working folder
 
 ```bash
-cd filedb_starter
+cd Naive_File_DB
 ```
 
-- **Changes your current directory** to the project folder named `filedb_starter`.
+- **Changes your current directory** to the project folder named `Naive_File_DB`.
 - After this, any relative paths (like `.venv` or `requirements.txt`) are looked up inside that folder.
 
 #### 2. Create virtual environment
