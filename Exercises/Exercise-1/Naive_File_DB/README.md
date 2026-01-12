@@ -568,8 +568,8 @@ def next_id_naive(rows: List[Dict[str, str]]) -> int:
 Then run in two terminals:
 
 ```bash
-FILEDB_SLOW_ID=1 python -m src.filedb add-member --name "Clerk A" --email "a@example.com"
-FILEDB_SLOW_ID=1 python -m src.filedb add-member --name "Clerk B" --email "b@example.com"
+cmd /c "FILEDB_SLOW_ID=1 python -m src.filedb add-member --name "Clerk A" --email "a@example.com""
+cmd /c "FILEDB_SLOW_ID=1 python -m src.filedb add-member --name "Clerk B" --email "b@example.com""
 ```
 
 ---
