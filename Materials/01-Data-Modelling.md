@@ -265,12 +265,16 @@ It is important to distinguish:
         
 - **Entity Instance** → A specific real-world object
     
-    - Example:
+    - Example (row in database):
         
         - Student #1001: Alice
             
         - Student #1002: Bob
-            
+
+    | StudentId | Name |
+    |-----------|------|
+    |1001|Alice|
+    |1002|Bob|  
 
 In databases, tables represent **entity types**, while rows represent **entity instances**.
 
@@ -298,6 +302,10 @@ Possible attributes:
 - total_amount
     
 - shipping_address
+  
+- name
+  
+- title
     
 
 Each row in an Order table corresponds to one real-world order.
@@ -308,9 +316,9 @@ Each row in an Order table corresponds to one real-world order.
 
 ### ✅ Simple vs Composite Attributes
 
-- **Simple attribute**: Cannot be divided further
+- **Simple attribute**: Cannot be divided further 
     
-    - Example: student_id
+    - Example: student_id -> numeric/string id value that stays static 
         
 - **Composite attribute**: Can be broken into parts
     
@@ -332,6 +340,16 @@ Why split composite attributes?
 - Better data structure
     
 - More flexibility
+
+
+The key idea is to allow users (devs) to write more precise queries (e.g. SQL)
+
+- e.g. Consider a situation where we want to find student's last name
+    - If the table/data model only has single field for name (composite attribute for first and last name), now we have to include additional logic in our queries.
+    - What happens if the student's name has 3 names (first, middle, last)?
+    - What happens if the student's last or first name has multiple parts (typically the names should be joined with dash "-")
+    - What happens if the student's name doesn't include last name (invalid data)
+    - By separating/dividing the name into first and last name, the process of searching data becomes much easier and we also gain better error/invalid data control.
     
 
 ---
@@ -349,6 +367,10 @@ Why split composite attributes?
 
 In relational databases, multi-valued attributes are typically converted into separate tables.
 
+e.g. [Student] 1 --- < [Phone]
+
+Depending on case, we might also use **junction tables** to make the connection between table data.
+
 ---
 
 ### ✅ Derived Attributes
@@ -364,25 +386,32 @@ Example:
 
 This avoids redundancy and inconsistency.
 
+    - In the case of age, we would have to update the value each year
+    - What happens if update query fails for one reason or another?
+
 ---
 
 ## **2.5 Primary Key — The Identifier**
 
-A **primary key** must satisfy:
+A **primary key** is an attribute that is used to identify entity instants (rows) and must satisfy:
 
 - Uniqueness — no duplicates
     
 - Minimality — contains no unnecessary attributes
     
 - Stability — does not change over time
+    - If there is a need to change primary key, a new row is typically created and the old one is deleted
+    - e.g. updating user's id -> extreme case
     
 
-Why not use name as a primary key?
+Why not use name or email as a primary key?
 
 - Two people can have the same name
-    
-- Names can change
-    
+  
+- Emails are typically personal and unique, but multiple people can use same email (parent & child)
+  
+- Names and emails can change
+
 
 Hence, we use:
 
@@ -391,7 +420,8 @@ Hence, we use:
 - employee_id
     
 - order_id
-    
+
+    - Orders can have delivery codes that are unique, but these can once again change -> delivery company makes a mistake or the package is rerouted 
 
 ---
 
@@ -403,10 +433,12 @@ Hence, we use:
 
 A relationship describes how two entities are connected.
 
-Without relationships, a database would be just isolated tables with no meaning.
+Without relationships, a database would be just isolated tables with little to no meaning.
 
 **Example:**
 
+- We have 2 tables/entities Student and Course
+  
 - Student takes Course
     
 
@@ -433,7 +465,7 @@ Example:
 - Doctor treats Patient in Hospital
     
 
-This is more complex and typically handled in advanced modelling.
+This is more complex and typically handled in advanced modelling (junction tables).
 
 ---
 
@@ -452,6 +484,8 @@ Example:
 
 These are not attributes of Student or Course alone — they belong to the relationship.
 
+ - In this example case, we could create a new junction table for Course_Result where we would store all student specific course completion data
+
 ---
 
 
@@ -464,9 +498,9 @@ Each instance of one entity relates to at most one instance of another.
 
 Examples:
 
-- Person ↔ Passport
+- Person ↔ Passport -> each person typically only have one passport
     
-- Car ↔ License Plate
+- Car ↔ License Plate -> one car can only have one license plate
     
 
 Often implemented with a **unique foreign key** in one table.
@@ -479,7 +513,7 @@ One entity relates to many instances of another.
 
 Examples:
 
-- Department employs many Employees
+- Department employs many Employees -> one building with many employees
     
 - Customer places many Orders
     
@@ -494,10 +528,12 @@ Many instances of one entity relate to many of another.
 
 Example:
 
-- Student ↔ Course
+- Student ↔ Course -> each course can have multiple students and students can participate in many courses.
     
 
-Cannot be implemented directly — requires a **junction table**.
+Cannot be implemented directly — requires a **junction table**. 
+
+- Without junction table there will be a lot of redundant/duplicate data
 
 ---
 
@@ -512,11 +548,14 @@ If participation is mandatory, the entity must be part of the relationship.
 Example:
 
 - Every Employee must belong to a Department
+  
+- Every Student mus belong to a University
     
 
 In a database:
 
-- department_id cannot be NULL.
+- Department must exist -> department_id cannot be NULL.
+- University must exist -> university_id cannot be NULL.
     
 
 ---
@@ -533,6 +572,8 @@ Example:
 In a database:
 
 - mentor_id can be NULL.
+
+- Mentor/employee exists, but is not assigned to a student 
     
 
 ---
@@ -546,6 +587,8 @@ Example:
 - It may have zero employees (optional)
     
 - Every Employee must belong to a Department (mandatory)
+
+- We can have departments with no employees      
     
 
 This reasoning is central to good data modelling.
