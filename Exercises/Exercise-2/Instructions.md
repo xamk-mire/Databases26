@@ -203,6 +203,11 @@ Draw a rectangle for each entity and write its **primary key** clearly.
 Use this space (or a separate sheet):
 
 - You can draw the ER diagram using software or app
+ - [drawIo](https://www.drawio.com/) - (basic and beginner friendly)
+ - [smartdraw](https://www.smartdraw.com/entity-relationship-diagram/er-diagram-tool.htm) - (good, but some tools are somewhat hidden)
+ - [dbdiagram](https://dbdiagram.io/home) - (draw er diagrams using tables and vice versa)
+ - [lucidchart](https://www.lucidchart.com/pages/examples/er-diagram-tool) - (great tool but requires an account)
+  
 - Once you have finished drawing the diagram, you can download or just take a screenshot of the diagram
 - Add the image inside your exercise folder/repository
 - You should now be able to add the image as a link here [Adding images in markdown](https://www.markdownguide.org/basic-syntax/#images-1)
