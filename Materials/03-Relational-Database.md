@@ -649,10 +649,6 @@ They work well when:
 
 ---
 
-Below is an expanded, lecture-ready version of your **Common Beginner Mistakes** section, written in a **more literary / explanatory** style with **bullet-point keyword highlights** and **examples + fixes** that connect clearly to relational thinking.
-
----
-
 # 10) Common Beginner Mistakes 
 
 Every beginner builds their first database the same way a beginner builds their first city in a simulation game:
