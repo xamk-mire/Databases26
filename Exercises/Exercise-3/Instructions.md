@@ -357,7 +357,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 
 **B4.1** For each member, show `member_id` and the **number of loans**. Use `GROUP BY member_id` and `COUNT(*)` with an alias (e.g. `loan_count`). Order by `loan_count` descending.
 
-*Self-check: Member 1 has 2 loans; members 2, 3, 4 each have 1.*
+*Self-check: Member 1 & 2 both have 2 loans; members 3 & 4 each have 1.*
 
 ```sql
 
@@ -368,7 +368,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 
 **B4.2** List only members who have **at least 2 loans**. Use the same grouping as B4.1 and add `HAVING COUNT(*) >= 2`.
 
-*Self-check: 1 row (member_id 1).*
+*Self-check: 2 rows, members 1 & 2*
 
 ```sql
 
@@ -379,7 +379,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 
 **B4.3** For each author, show `author_id` and the **number of books** they wrote (via `book_authors`). Use `GROUP BY author_id`. Order by book count descending.
 
-*Self-check: Authors 2 and 3 have 2 books each; author 1 has 2 books.*
+*Self-check: Authors 2 has 3 books; author 1 and 3 have 2 books each.*
 
 ```sql
 
