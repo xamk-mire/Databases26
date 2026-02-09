@@ -89,6 +89,8 @@ Every JOIN has:
 
 The condition decides which rows from the left and right tables are paired.
 
+[Good example materials in w3school](https://www.w3schools.com/sql/sql_join.asp)
+
 ---
 
 ## INNER JOIN — Only matching rows
