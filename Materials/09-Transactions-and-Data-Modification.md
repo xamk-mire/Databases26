@@ -11,7 +11,6 @@ This chapter focuses on **changing and removing data** and **controlling how cha
 - **Transactions** — Grouping statements so they succeed or fail together
 - **ACID properties** — What the database guarantees
 - **Rollbacks** — Undoing work within a transaction
-- **Isolation levels** — How concurrent transactions see each other’s changes (introductory)
 
 This chapter uses the same **university database** as in [Materials 05](05-SQL-fundamentals.md)–[07](07-SQL-fundamentals-3.md): `students`, `courses`, `enrollments`, `grades`, `teachers`.
 
