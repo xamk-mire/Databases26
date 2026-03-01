@@ -44,19 +44,19 @@ Answer the following about the **`medal_results`** table. Use the table structur
 
 _Your answer:_
 
----
+If Mika Virtanen’s name is corrected, it must be updated in every row where he appears. If we update only one row, the database will contain inconsistent data (some rows with the old name, some with the corrected name).
 
 **A1.2** **Insert anomaly** — We want to add a new event "Team Relay" in Cross-Country Skiing, at Mountain Resort, Zhangjiakou, before any athlete has competed in it. Can we do it with this single table? Explain briefly.
 
 _Your answer:_
 
----
+No, we cannot add the new event without inserting an athlete and medal result, because the table stores everything in one row. This design prevents inserting an event independently of a result.
 
 **A1.3** **Delete anomaly** — If we delete the row for Sara Niemi in Women’s Slalom, what information do we lose beyond that one medal result?
 
 _Your answer:_
 
----
+If we delete the row for Sara Niemi in Women’s Slalom, we also lose the event information, sport name, venue name, city, and country information if they appear only in that row.
 
 ### A2 — First Normal Form (1NF)
 
@@ -66,14 +66,13 @@ The `medal_results` table has atomic values in each cell and a primary key `(ath
 
 _Your answer:_
 
----
+Yes. Each column contains atomic values and the table has a defined primary key.
 
 **A2.2** Suppose instead we had a column `events_won` storing multiple values in one cell, e.g. `"Men's Downhill, Men's 50km"`. Why would that **not** be 1NF?
 
 _Your answer:_
 
----
-
+Because a single column would contain multiple values in one cell, which violates the requirement that each field must contain only one atomic value.
 ### A3 — Second Normal Form (2NF)
 
 The primary key of `medal_results` is **composite**: `(athlete_id, event_id)`.
@@ -82,19 +81,50 @@ The primary key of `medal_results` is **composite**: `(athlete_id, event_id)`.
 
 _Your answer:_
 
----
+Depends only on athlete_id:
 
+athlete_name
+
+country_code
+
+country_name
+
+Depends only on event_id:
+
+event_name
+
+sport_name
+
+venue_name
+
+city
+
+Depends on both (full key):
+
+medal_type
 **A3.2** So does `medal_results` satisfy 2NF? (Yes/No and one sentence.)
 
 _Your answer:_
 
----
+No. The table does not satisfy 2NF because there are partial dependencies on parts of the composite primary key.
 
 **A3.3** To achieve 2NF, we split into separate tables. List the **tables** you would have and each table’s **primary key**. (You will implement these in Part B.)
 
 _Your answer:_
 
----
+To achieve 2NF, we split into these tables:
+
+countries (country_id PRIMARY KEY)
+
+athletes (athlete_id PRIMARY KEY)
+
+sports (sport_id PRIMARY KEY)
+
+venues (venue_id PRIMARY KEY)
+
+events (event_id PRIMARY KEY)
+
+results (PRIMARY KEY (athlete_id, event_id))
 
 ### A4 — Third Normal Form (3NF)
 
@@ -104,13 +134,19 @@ Suppose we had split events into a table **`events(event_id, event_name, sport_i
 
 _Your answer:_
 
----
+There is a transitive dependency where city depends on venue_name (a non-key attribute depends on another non-key attribute).
 
 **A4.2** How do we fix it to satisfy 3NF? (Name the tables: e.g. one for venues, one for events with only venue_id.)
 
 _Your answer:_
 
----
+We fix it by creating a separate venues table:
+
+venues (venue_id, venue_name, city)
+
+events (event_id, event_name, sport_id, venue_id)
+
+This removes the transitive dependency.
 
 ### A5 — When denormalization might be acceptable (short)
 
@@ -118,7 +154,7 @@ Give **one** situation where denormalization is sometimes used despite the risk 
 
 _Your answer:_
 
----
+Denormalization is sometimes used in reporting or analytics systems to improve query performance and reduce complex joins.
 
 ## PART B — Normalize to 3NF using transactions
 
@@ -137,11 +173,45 @@ Run your CREATE statements **inside a transaction**: `BEGIN;` … your CREATE TA
 ```sql
 BEGIN;
 
--- Your CREATE TABLE countries; ... CREATE TABLE results; here
+CREATE TABLE countries (
+    country_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    country_code TEXT UNIQUE NOT NULL,
+    country_name TEXT NOT NULL
+);
 
+CREATE TABLE athletes (
+    athlete_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    full_name TEXT NOT NULL,
+    country_id INTEGER REFERENCES countries(country_id),
+    email TEXT
+);
+
+CREATE TABLE sports (
+    sport_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    sport_name TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE venues (
+    venue_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    venue_name TEXT NOT NULL,
+    city TEXT NOT NULL
+);
+
+CREATE TABLE events (
+    event_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    event_name TEXT NOT NULL,
+    sport_id INTEGER REFERENCES sports(sport_id),
+    venue_id INTEGER REFERENCES venues(venue_id)
+);
+
+CREATE TABLE results (
+    athlete_id INTEGER REFERENCES athletes(athlete_id),
+    event_id INTEGER REFERENCES events(event_id),
+    medal_type TEXT CHECK (medal_type IN ('gold','silver','bronze')),
+    PRIMARY KEY (athlete_id, event_id)
+);
 
 COMMIT;
-```
 
 ---
 
@@ -149,8 +219,7 @@ COMMIT;
 
 _Your answer:_
 
----
-
+Because venue is a separate entity, and city depends on venue, so events should store only venue_id as a foreign key instead of repeating venue_name and city.
 ### B2 — Migrate data using a transaction
 
 Copy data from `medal_results` into the new tables in **dependency order**:
@@ -169,18 +238,52 @@ Write your migration (all INSERTs) in the block below. Use one transaction for t
 ```sql
 BEGIN;
 
--- 1. INSERT INTO countries ...
--- 2. INSERT INTO athletes ... (use OVERRIDING SYSTEM VALUE for athlete_id)
--- 3. INSERT INTO sports ...
--- 4. INSERT INTO venues ...
--- 5. INSERT INTO events ... (use OVERRIDING SYSTEM VALUE for event_id, join to sports and venues)
--- 6. INSERT INTO results ...
+-- 1. Countries
+INSERT INTO countries (country_code, country_name)
+SELECT DISTINCT country_code, country_name
+FROM medal_results;
 
--- Verify before COMMIT:
--- SELECT COUNT(*) FROM results;  -- should be 8
--- SELECT COUNT(*) FROM athletes;  -- should be 6
+-- 2. Athletes
+INSERT INTO athletes (athlete_id, full_name, country_id)
+OVERRIDING SYSTEM VALUE
+SELECT DISTINCT m.athlete_id,
+       m.athlete_name,
+       c.country_id
+FROM medal_results m
+JOIN countries c ON m.country_code = c.country_code;
 
-COMMIT;   -- or ROLLBACK; if something is wrong
+-- 3. Sports
+INSERT INTO sports (sport_name)
+SELECT DISTINCT sport_name
+FROM medal_results;
+
+-- 4. Venues
+INSERT INTO venues (venue_name, city)
+SELECT DISTINCT venue_name, city
+FROM medal_results;
+
+-- 5. Events
+INSERT INTO events (event_id, event_name, sport_id, venue_id)
+OVERRIDING SYSTEM VALUE
+SELECT DISTINCT m.event_id,
+       m.event_name,
+       s.sport_id,
+       v.venue_id
+FROM medal_results m
+JOIN sports s ON m.sport_name = s.sport_name
+JOIN venues v ON m.venue_name = v.venue_name
+             AND m.city = v.city;
+
+-- 6. Results
+INSERT INTO results (athlete_id, event_id, medal_type)
+SELECT athlete_id, event_id, medal_type
+FROM medal_results;
+
+-- Verification
+SELECT COUNT(*) FROM results;   -- should be 8
+SELECT COUNT(*) FROM athletes;  -- should be 6
+
+COMMIT;
 ```
 
 ---
@@ -189,8 +292,7 @@ COMMIT;   -- or ROLLBACK; if something is wrong
 
 _Your answer:_
 
----
-
+Because if any step fails, the entire migration can be rolled back, keeping the database consistent.
 ### B3 — Drop the old table (in a transaction)
 
 **B3.1** Once the migration is committed and you have verified the data (e.g. 8 rows in **results**, 6 in **athletes**), drop the old table. Do it in a transaction: `BEGIN; DROP TABLE medal_results; COMMIT;` so that if something else depends on it, you can ROLLBACK.
@@ -218,7 +320,9 @@ Use the **normalized** Winter Olympics database (countries, athletes, sports, ve
 _Self-check: `SELECT full_name, email FROM athletes WHERE athlete_id = 2;` shows the new email._
 
 ```sql
-
+UPDATE athletes
+SET email = 'sara.niemi@olympics.fi'
+WHERE athlete_id = 2;
 
 ```
 
@@ -229,7 +333,9 @@ _Self-check: `SELECT full_name, email FROM athletes WHERE athlete_id = 2;` shows
 _Self-check: No event should have venue_id = 1 after the update._
 
 ```sql
-
+UPDATE events
+SET venue_id = 3
+WHERE venue_id = 1;
 
 ```
 
@@ -239,7 +345,7 @@ _Self-check: No event should have venue_id = 1 after the update._
 
 _Your answer:_
 
----
+Before running an UPDATE affecting multiple rows, we should first run a SELECT with the same WHERE clause to verify which rows will be affected.
 
 ### C2 — DELETE
 
@@ -248,7 +354,8 @@ _Your answer:_
 _Self-check: `SELECT _ FROM results;` should have 7 rows.\*
 
 ```sql
-
+DELETE FROM results
+WHERE athlete_id = 5 AND event_id = 5;
 
 ```
 
@@ -258,8 +365,7 @@ _Self-check: `SELECT _ FROM results;` should have 7 rows.\*
 
 _Your answer:_
 
----
-
+We should first run a SELECT with the same WHERE clause to see which rows will be deleted and avoid accidental data loss.
 ### C3 — Transactions (BEGIN, COMMIT)
 
 **C3.1** Use a **transaction** to do two things together:
@@ -272,6 +378,14 @@ You need the new `athlete_id` for the result row (e.g. use `RETURNING athlete_id
 ```sql
 BEGIN;
 
+INSERT INTO athletes (full_name, country_id, email)
+VALUES ('Liisa Korhonen', 1, NULL)
+RETURNING athlete_id;
+
+-- Assume returned athlete_id = 7
+
+INSERT INTO results (athlete_id, event_id, medal_type)
+VALUES (7, 4, 'bronze');
 
 COMMIT;
 ```
@@ -282,7 +396,7 @@ COMMIT;
 
 _Your answer:_
 
----
+Because both inserts must succeed together; otherwise, we would have incomplete or inconsistent data.
 
 ### C4 — Rollback
 
@@ -291,6 +405,9 @@ _Your answer:_
 ```sql
 BEGIN;
 
+UPDATE athletes
+SET email = 'rollback_test@test.com'
+WHERE athlete_id = 1;
 
 ROLLBACK;
 ```
@@ -301,7 +418,7 @@ ROLLBACK;
 
 _Your answer:_
 
----
+ROLLBACK cancels all changes made since the last BEGIN and restores the database to its previous state.
 
 ## Self-check (validation)
 
