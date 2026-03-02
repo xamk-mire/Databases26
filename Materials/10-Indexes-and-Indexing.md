@@ -50,7 +50,15 @@ When a query runs, the optimizer decides whether to use an index:
 - **Sequential scan (Seq Scan):** read every row and filter
 - **Index scan:** use the index to jump to matching rows
 
-The choice depends on table size, selectivity, and statistics. For small tables or low‑selectivity columns, a sequential scan can be faster.
+The choice depends on table size, selectivity, and statistics. For small tables or low-selectivity columns, a sequential scan can be faster.
+
+Even if an index exists, it may not be used when:
+
+- The query returns a large part of the table
+- The filter does not match the indexed column(s)
+- A composite index is used without the leftmost column
+- A function or cast is applied to the column (unless a functional index exists)
+- The pattern starts with a wildcard, e.g. `LIKE '%text'`
 
 Indexes do **not** change query results; they only change **how** the database finds the rows.
 
@@ -292,6 +300,23 @@ Use `EXPLAIN` for learning and debugging; for real performance analysis you woul
 
 You can compare two versions of the same query before and after creating an index to see the planner change its choice.
 
+### Forcing Seq Scan on and off (small databases)
+
+On small tables, PostgreSQL often prefers sequential scans even when an index exists.  
+For learning, you can temporarily disable Seq Scans to see index usage.
+
+```sql
+-- Force the planner to avoid sequential scans
+SET enable_seqscan = off;
+
+EXPLAIN SELECT * FROM students WHERE email = 'aino@uni.fi';
+
+-- Restore default behavior
+SET enable_seqscan = on;
+```
+
+These settings are session-level and reset when you reconnect.
+
 ---
 
 ## EXPLAIN in practice
@@ -314,6 +339,13 @@ WHERE s.student_id = 1;
 - **Seq Scan** — PostgreSQL scans the whole table.
 - **Index Scan / Index Only Scan** — PostgreSQL uses an index.
 - **Join type** (e.g. Nested Loop, Hash Join) — how tables are combined.
+
+If you expected an index but see a Seq Scan, check:
+
+- Is the filter selective enough?
+- Does the query match the indexed column and order?
+- Are you applying a function or cast without a matching functional index?
+- Is the table you are targeting large enough -> is the seq scan faster
 
 ### EXPLAIN ANALYZE (runs the query)
 
