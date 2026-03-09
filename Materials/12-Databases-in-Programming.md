@@ -295,5 +295,5 @@ Understanding how databases fit into programming—the purpose they serve and ho
 - [00 – Introduction](00-Introduction.md) — What is a database, and why were they developed?
 - [04 – PostgreSQL](04-PostgreSQL.md) — Introduction to PostgreSQL
 - [05 – SQL Fundamentals](05-SQL-fundamentals.md) — Building and querying with SQL
-- [13 – Entity Framework Core](13-Entity-Framework-Core.md) — A practical ORM for .NET applications
-- [14 – Managing Users and Roles in Programming](14-Managing-Users-and-Roles-in-Programming.md) — Application-level users, roles, and database access
+- [13 – Entity Framework Core](13-ORM-and-EF-Core.md) — A practical ORM for .NET applications
+- [14 – Managing Users and Roles in Programming](14-Users-and-Roles-in-Programming.md) — Application-level users, roles, and database access
