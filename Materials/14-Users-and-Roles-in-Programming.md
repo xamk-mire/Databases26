@@ -342,4 +342,4 @@ This gives full control but requires more code and care.
 
 - [11 – Users and Roles](11-Users-and-Roles.md) — Database-level roles, privileges, GRANT/REVOKE in PostgreSQL
 - [12 – Databases in Programming](12-Databases-in-Programming.md) — Purpose of databases in programming, connection patterns
-- [13 – Entity Framework Core](13-Entity-Framework-Core.md) — ORM for .NET, including Identity integration
+- [13 – Entity Framework Core](13-ORM-and-EF-Core.md) — ORM for .NET, including Identity integration
