@@ -520,7 +520,7 @@ EF Core 10 (with .NET 10) adds capabilities such as improved LINQ-to-SQL transla
 - [12 – Databases in Programming](12-Databases-in-Programming.md) — Purpose of databases in programming, ORMs, CRUD, transactions
 - [05 – SQL Fundamentals](05-SQL-fundamentals.md) — SQL basics (tables, keys, queries)
 - [09 – Transactions and Data Modification](09-Transactions-and-Data-Modification.md) — Transactions in SQL
-- [14 – Managing Users and Roles in Programming](14-Managing-Users-and-Roles-in-Programming.md) — Application users, roles, and Identity integration
+- [14 – Managing Users and Roles in Programming](14-Users-and-Roles-in-Programming.md) — Application users, roles, and Identity integration
 
 ## Further reading
 
