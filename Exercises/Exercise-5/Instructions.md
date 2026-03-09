@@ -8,7 +8,7 @@
 > **Prerequisites:**
 >
 > - .NET 10 SDK
-> - PostgreSQL with `university_db` created and populated (see [university_db_schema.sql](./Materials/Example-db/university_db_schema.sql) and [university_db_seed.sql](./Materials/Example-db/university_db_seed.sql))
+> - PostgreSQL with `university_db` created and populated (see [university_db_schema.sql](../../Materials/Example-db/university_db_schema.sql) and [university_db_seed.sql](../../Materials/Example-db/university_db_seed.sql))
 > - Materials 12 (Databases in Programming), 13 (Entity Framework Core)
 
 ---
@@ -59,8 +59,8 @@ dotnet tool install --global dotnet-ef
 Ensure `university_db` exists and has data:
 
 1. Create the database (if needed): `CREATE DATABASE university_db;`
-2. Run [university_db_schema.sql](./Materials/Example-db/university_db_schema.sql) to create tables.
-3. Run [university_db_seed.sql](./Materials/Example-db/university_db_seed.sql) to insert sample data.
+2. Run [university_db_schema.sql](../../Materials/Example-db/university_db_schema.sql) to create tables.
+3. Run [university_db_seed.sql](../../Materials/Example-db/university_db_seed.sql) to insert sample data.
 
 ---
 
