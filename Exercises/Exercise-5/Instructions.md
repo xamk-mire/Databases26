@@ -378,17 +378,17 @@ async Task RunAsync()
                 break;
 
             case "6":
-                // ========== TODO D6: Create new student ==========
+                // ========== (Optional) TODO D6: Create new student ==========
                 Console.WriteLine("(D6 not yet implemented)");
                 break;
 
             case "7":
-                // ========== TODO D7: Update student ==========
+                // ========== (Optional) TODO D7: Update student ==========
                 Console.WriteLine("(D7 not yet implemented)");
                 break;
 
             case "8":
-                // ========== TODO D8: Delete student ==========
+                // ========== (Optional) TODO D8: Delete student ==========
                 Console.WriteLine("(D8 not yet implemented)");
                 break;
 
