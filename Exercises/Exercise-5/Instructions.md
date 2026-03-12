@@ -289,6 +289,17 @@ dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Host=localhost;Po
 
 Then read the connection string from User Secrets or `appsettings.json` in your code.
 
+
+If necessary, add the code below inside **.csproj** -> Visual Studio requires it, but VS Code should work without it. (Terminal commands: dotnet run)
+You can only add <None> element items inside an existing **ItemGroup**.
+
+```
+<ItemGroup>
+  <None Update="appsettings.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
+```
 ---
 
 ## Part D — Program.cs: interactive console with menu
