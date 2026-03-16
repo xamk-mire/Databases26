@@ -40,7 +40,7 @@ your-Classroom-repo-name
 - Completed Assignments 1–3 (TrailShop database)
 - .NET 10 SDK
 - PostgreSQL with TrailShop database created and populated
-- Familiarity with [Materials 13 — Entity Framework Core](../../Materials/13-Entity-Framework-Core.md)
+- Familiarity with [13-Entity Framework Core](../../Materials/13-Entity-Framework-Core.md), [15-Migrations](../../Materials/15-Entity-Framework-Core-Migrations.md) & [16-Scaffolding](../../Materials/16-Entity-Framework-Core-Scaffolding.md)
 - Exercise 5 (University Console with EF Core) is helpful but not required
 
 ---
