@@ -44,19 +44,19 @@ Answer the following about the **`medal_results`** table. Use the table structur
 
 _Your answer:_
 
----
+---If Mika Virtanen’s name is corrected, it must be updated in every row where he appears. If we update only one row, the database will contain inconsistent data (some rows with the old name, some with the corrected name).
 
 **A1.2** **Insert anomaly** — We want to add a new event "Team Relay" in Cross-Country Skiing, at Mountain Resort, Zhangjiakou, before any athlete has competed in it. Can we do it with this single table? Explain briefly.
 
 _Your answer:_
 
----
+---No, we cannot add the new event without inserting an athlete and medal result, because the table stores everything in one row. This design prevents inserting an event independently of a result.
 
 **A1.3** **Delete anomaly** — If we delete the row for Sara Niemi in Women’s Slalom, what information do we lose beyond that one medal result?
 
 _Your answer:_
 
----
+---If we delete the row for Sara Niemi in Women’s Slalom, we also lose the event information, sport name, venue name, city, and country information if they appear only in that row.
 
 ### A2 — First Normal Form (1NF)
 
