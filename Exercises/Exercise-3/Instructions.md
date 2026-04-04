@@ -22,6 +22,7 @@ You can run this in **psql** (connect to PostgreSQL first, then run the command)
 **Write your SQL (if using psql):**
 
 ```sql
+create database library_db;
 
 
 ```
@@ -50,20 +51,53 @@ Create the following tables in **dependency order** (referenced tables first). U
 ```sql
 -- books
 
+create table books (
+    book_id int generated always as identity primary key,
+    title varchar(300) not null,
+    isbn varchar(20) unique null,
+    publication_year int check (publication_year between 1000 and 2100)
+);
 
 -- authors
 
+create table authors (
+    author_id int generated always as identity primary key,
+    full_name varchar(100) not null
+);
 
 -- book_authors
-
+create table book_authors (
+    book_id int not null references books(book_id),
+    author_id int not null references authors(author_id),
+    primary key (book_id, author_id)
+);
 
 -- members
 
+create table members (
+    member_id int generated always as identity primary key,
+    full_name varchar(100) not null,
+    email varchar(255) unique null
+);
 
 -- loans
 
-
+create table loans (
+    loan_id int generated always as identity primary key,
+    book_id int not null references books(book_id),
+    member_id int not null references members(member_id),
+    loan_date date not null,
+    due_date date not null,
+    return_date date null
+);
 -- fines
+
+create table fines (
+    fine_id int generated always as identity primary key,
+    loan_id int not null references loans(loan_id),
+    amount numeric(6,2) not null check (amount >= 0),
+    paid boolean not null default false
+);
 
 ```
 
@@ -138,20 +172,40 @@ Insert the rows below into each table. **Omit identity columns** (PostgreSQL wil
 ```sql
 -- books
 
+insert into books (title, isbn, publication_year) values
+('The Great Novel', '978-0-00-000001-1', 2020),
+('Databases 101', '978-0-00-000002-2', 2019),
+('Web Development', null, 2021),
+('Algorithms', '978-0-00-000004-4', 2018);
 
 -- authors
+insert into authors (full_name) values ('Jane Smith'), ('Mika Virtanen'), ('Aino Laine');
 
 
 -- book_authors
+insert into book_authors (book_id, author_id) values (1,1), (1,2), (2,1), (2,2), (3,2), (3,3), (4,3);
 
 
 -- members
 
-
+insert into members (full_name, email) values 
+('Aino Laine', 'aino@library.fi'),
+('Mika Virtanen', 'mika@library.fi'),
+('Sara Niemi', null),
+('Olli Koski', 'olli@gmail.com');
 -- loans
 
+insert into loans (book_id, member_id, loan_date, due_date, return_date) values
+(1, 1, '2024-01-01', '2024-01-15', '2024-01-10'),
+(2, 1, '2024-02-01', '2024-02-15', null),
+(1, 2, '2024-01-10', '2024-01-25', '2024-01-20'),
+(3, 2, '2024-03-01', '2024-03-15', null),
+(2, 3, '2024-02-10', '2024-02-24', '2024-02-20'),
+(4, 4, '2024-03-10', '2024-03-24', '2024-03-20');
 
 -- fines
+insert into fines (loan_id, amount, paid) values 
+(1, 2.00, true), (3, 5.50, false), (5, 10.00, true), (6, 3.00, false);
 
 ```
 
@@ -168,9 +222,10 @@ Run two queries to confirm the data is in place:
 
 ```sql
 -- 1. All columns from one table
-
+select * from members;
 
 -- 2. Specific columns from another table
+select title, publication_year from books;
 
 ```
 
@@ -189,6 +244,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Expected: 1 row (The Great Novel).*
 
 ```sql
+select * from books where publication_year = 2020; 
 
 
 ```
@@ -200,6 +256,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 2 rows (Mika Virtanen, Olli Koski).*
 
 ```sql
+select * from members where email != 'aino@library.fi'; 
 
 
 ```
@@ -211,6 +268,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 2 rows (5.50 and 10.00).*
 
 ```sql
+select * from fines where amount > 5; 
 
 
 ```
@@ -222,6 +280,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 4 rows.*
 
 ```sql
+select * from loans where book_id = 1 or book_id = 2; 
 
 
 ```
@@ -233,6 +292,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 2 rows (Aino Laine, Sara Niemi).*
 
 ```sql
+select * from members where member_id in (1, 3); 
 
 
 ```
@@ -244,6 +304,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 3 rows.*
 
 ```sql
+select * from books where publication_year between 2018 and 2020; 
 
 
 ```
@@ -255,6 +316,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 2 rows.*
 
 ```sql
+select * from members where email like '%@library.fi'; 
 
 
 ```
@@ -266,6 +328,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 1 row (Sara Niemi).*
 
 ```sql
+select * from members where email is null; 
 
 
 ```
@@ -277,6 +340,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 2 rows.*
 
 ```sql
+select * from loans where return_date is null;
 
 
 ```
@@ -290,6 +354,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: First row is Web Development (2021), then The Great Novel (2020), then Databases 101 (2019), then Algorithms (2018).*
 
 ```sql
+select * from books order by publication_year desc, title asc;
 
 
 ```
@@ -301,6 +366,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 2 rows (Web Development, The Great Novel).*
 
 ```sql
+select * from books order by publication_year desc limit 2;
 
 
 ```
@@ -314,6 +380,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 4.*
 
 ```sql
+select count(*) as book_count from books;
 
 
 ```
@@ -326,6 +393,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 
 ```sql
 
+select count(email) from members;
 
 ```
 
@@ -336,6 +404,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 5.125 (or 5.13 depending on rounding).*
 
 ```sql
+select avg(amount) as avg_fine_val from fines;
 
 
 ```
@@ -347,6 +416,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 8.50 (5.50 + 3.00).*
 
 ```sql
+select sum(amount) from fines where paid = false;
 
 
 ```
@@ -360,6 +430,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: Member 1 & 2 both have 2 loans; members 3 & 4 each have 1.*
 
 ```sql
+select member_id, count(*) as num_loans from loans group by member_id order by num_loans desc;
 
 
 ```
@@ -371,6 +442,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 2 rows, members 1 & 2*
 
 ```sql
+select member_id, count(*) as num_loans from loans group by member_id having count(*) >= 2;
 
 
 ```
@@ -383,6 +455,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 
 ```sql
 
+select author_id, count(*) as total_books from book_authors group by author_id order by total_books desc;
 
 ```
 
@@ -395,6 +468,7 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 6.*
 
 ```sql
+select count(*) as total_loans_in_system from loans;
 
 
 ```
@@ -406,6 +480,11 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 6 rows; first row might be Aino Laine with a book title.*
 
 ```sql
+select m.full_name, b.title 
+from loans l
+join members m on l.member_id = m.member_id
+join books b on l.book_id = b.book_id
+order by m.full_name, b.title;
 
 
 ```
@@ -419,6 +498,12 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 *Self-check: 1 row — Aino Laine with loan_count 2.*
 
 ```sql
+select m.full_name, count(*) as loan_count
+from loans l
+join members m on l.member_id = m.member_id
+group by m.full_name
+having count(*) >= 2
+order by loan_count desc, m.full_name;
 
 
 ```
@@ -429,11 +514,14 @@ Based on [Materials/06-SQL-fundamentals-2.md](../../Materials/06-SQL-fundamental
 
 Confirm the following:
 
-1. Does B1.1 return exactly 1 row?
-2. Does B1.8 return exactly 1 row (Sara Niemi)?
-3. Does B3.1 return 4?
-4. Does B4.2 return exactly 1 row?
-5. Does B5.1 return 6?
+1. Does B1.1 return exactly 1 row? YES
+2. Does B1.8 return exactly 1 row (Sara Niemi)? YES
+3. Does B3.1 return 4? YES
+4. Does B4.2 return exactly 1 row? NO
+5. Does B5.1 return 6? YES
+6. B6.1 RETURN 2  ROW?  **!!! NOT OK???***
+
+   ---
 
 ---
 
